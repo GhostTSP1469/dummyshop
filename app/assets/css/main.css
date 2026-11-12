@@ -1,0 +1,55 @@
+@import "@fontsource-variable/golos-text";
+@import "@fontsource-variable/oswald";
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Golos Text Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Oswald Variable", Impact, sans-serif;
+  --color-ink: #0c0c0b;
+  --color-panel: #141413;
+  --color-line: #2a2a27;
+  --color-bone: #ecebe6;
+  --color-dim: #8b8a84;
+  --color-acid: #d4ff3a;
+}
+
+html {
+  background-color: var(--color-ink);
+  color: var(--color-bone);
+  color-scheme: dark;
+}
+
+body {
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+h1, h2 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.01em;
+}
+
+h1 {
+  font-style: italic;
+  transform: skewX(-6deg);
+  transform-origin: left bottom;
+  text-shadow: 4px 4px 0 var(--color-acid);
+}
+
+::selection {
+  background: var(--color-acid);
+  color: var(--color-ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
