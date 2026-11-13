@@ -1,11 +1,21 @@
 <script setup lang="ts">
-import type {ProductResponse} from '~/types/product'
+import type {ProductData,ProductResponse} from '~/types/product'
 definePageMeta({middleware:'auth'})
 
  const { data,status,error,refresh ,clear } = await useFetch<ProductResponse>('https://dummyjson.com/products', {
     method: 'GET',
   })
 
+const {addToCart,isInCart,loadCart}=useCart()
+const adding=ref<number|null>(null)
+
+await loadCart()
+
+async function add(product:ProductData){
+  adding.value=product.id
+  await addToCart(product)
+  adding.value=null
+}
 </script>
 
 <template>
@@ -45,6 +55,17 @@ definePageMeta({middleware:'auth'})
             >
               -{{ Math.round(product.discountPercentage) }}%
             </span>
+
+            <button
+              type="button"
+              :disabled="adding === product.id"
+              class="absolute inset-x-0 bottom-0 flex min-h-11 translate-y-full items-center justify-center bg-acid font-display text-sm font-bold text-ink uppercase transition-transform duration-200 group-hover:translate-y-0 focus-visible:translate-y-0 disabled:opacity-60 max-sm:translate-y-0"
+              @click.prevent.stop="add(product)"
+            >
+              <span v-if="adding === product.id">Добавляем...</span>
+              <span v-else-if="isInCart(product.id)">Ещё одну</span>
+              <span v-else>В корзину</span>
+            </button>
           </div>
 
           <div class="mt-auto border-t border-line p-3 sm:p-4">

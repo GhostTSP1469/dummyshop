@@ -12,6 +12,30 @@ const activeImage=ref<number>(0)
 const {data:commentsData}=await useFetch<CommentResponse>(`https://dummyjson.com/comments/post/${route.params.id}`)
 const {userId,isLogin}=useAuth()
 
+const {items,addToCart,loadCart,cartError}=useCart()
+const adding=ref<boolean>(false)
+
+await loadCart()
+
+const inCartQuantity=computed(() => {
+  const found=items.value.find(item => item.id === Number(route.params.id))
+  if(found){
+    return found.quantity
+  }
+  return 0
+})
+
+const inCart=computed(() => inCartQuantity.value > 0)
+
+async function add(){
+  if(!data.value){
+    return
+  }
+  adding.value=true
+  await addToCart(data.value)
+  adding.value=false
+}
+
 const newText=ref<string>('')
 const sending=ref<boolean>(false)
 const commentError=ref<string>('')
@@ -116,6 +140,29 @@ async function sendComment(){
         <p class="mt-2 text-xs tracking-wide text-dim uppercase">
           {{ data.availabilityStatus }} / остаток {{ data.stock }}
         </p>
+
+        <div class="mt-8 flex flex-wrap items-center gap-3">
+          <button
+            type="button"
+            :disabled="adding"
+            class="inline-flex min-h-12 items-center bg-acid px-8 font-display text-lg font-bold text-ink uppercase transition-opacity active:opacity-80 disabled:opacity-60"
+            @click="add"
+          >
+            <span v-if="adding">Добавляем...</span>
+            <span v-else-if="inCart">Добавить ещё</span>
+            <span v-else>В корзину</span>
+          </button>
+
+          <NuxtLink
+            v-if="inCart"
+            to="/carts"
+            class="inline-flex min-h-12 items-center border border-line px-6 text-sm tracking-wide uppercase transition-colors hover:border-acid hover:text-acid"
+          >
+            В корзине: {{ inCartQuantity }}
+          </NuxtLink>
+        </div>
+
+        <p v-if="cartError" class="mt-3 text-sm text-red-400">{{ cartError }}</p>
 
         <p class="mt-8 max-w-[60ch] leading-relaxed text-bone/80">{{ data.description }}</p>
 
