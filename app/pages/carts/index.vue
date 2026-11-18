@@ -2,8 +2,10 @@
 import {X} from 'lucide-vue-next'
 definePageMeta({middleware:'auth'})
 
-const {items,loading,cartError,totalQuantity,total,discountedTotal,loadCart,removeFromCart}=useCart()
+const {items,loading,cartError,totalQuantity,total,discountedTotal,loadCart,removeFromCart,makeOrder}=useCart()
 const removing=ref<number|null>(null)
+const ordering=ref(false)
+const ordered=ref(false)
 
 await loadCart()
 
@@ -11,6 +13,12 @@ async function remove(id:number){
   removing.value=id
   await removeFromCart(id)
   removing.value=null
+}
+
+async function order(){
+  ordering.value=true
+  ordered.value=await makeOrder()
+  ordering.value=false
 }
 </script>
 
@@ -106,11 +114,21 @@ async function remove(id:number){
             <dd class="text-3xl font-medium">${{ discountedTotal.toFixed(2) }}</dd>
           </div>
         </dl>
+
+        <button
+          type="button"
+          :disabled="ordering"
+          class="mt-6 inline-flex min-h-11 w-full items-center justify-center bg-acid px-6 font-display text-lg font-bold text-ink uppercase transition-opacity active:opacity-80 disabled:opacity-50"
+          @click="order"
+        >
+          {{ ordering ? 'Отправляем...' : 'Заказать' }}
+        </button>
       </aside>
     </div>
 
     <div v-else-if="!loading" class="border-b border-line py-16">
-      <p class="text-xl font-medium">В корзине пока пусто</p>
+      <p v-if="ordered" class="text-xl font-medium text-acid">Заказ отправлен</p>
+      <p v-else class="text-xl font-medium">В корзине пока пусто</p>
       <NuxtLink
         to="/products"
         class="mt-6 inline-flex min-h-11 items-center bg-acid px-6 font-display text-lg font-bold text-ink uppercase transition-opacity active:opacity-80"

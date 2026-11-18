@@ -61,9 +61,27 @@ export function useCart(){
         }
     }
 
+    async function makeOrder(){
+        cartError.value=''
+        if('Notification' in window && Notification.permission === 'default'){
+            await Notification.requestPermission()
+        }
+        try{
+            const {text}=await $fetch<{text:string}>('/api/order',{method:'POST'})
+            items.value=[]
+            if('Notification' in window && Notification.permission === 'granted'){
+                new Notification('Заказ отправлен',{body:text})
+            }
+            return true
+        } catch (err:any) {
+            cartError.value=err?.statusMessage || 'Не удалось отправить заказ'
+            return false
+        }
+    }
+
     function isInCart(id:number){
         return items.value.some(item => item.id === id)
     }
 
-    return {items,loading,cartError,totalQuantity,total,discountedTotal,loadCart,addToCart,removeFromCart,isInCart}
+    return {items,loading,cartError,totalQuantity,total,discountedTotal,loadCart,addToCart,removeFromCart,makeOrder,isInCart}
 }

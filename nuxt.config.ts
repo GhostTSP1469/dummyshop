@@ -10,6 +10,11 @@ export default defineNuxtConfig({
       link: [{ rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }]
     }
   },
+  runtimeConfig: {
+    tgToken: '',
+    tgChat: '',
+    tgPhones: ''
+  },
   routeRules: {
     '/': { redirect: '/products' }
   },
